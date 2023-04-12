@@ -12,10 +12,18 @@ class saldatrice:
     temp_bath = 0
     RPM_mainPump = 0
     RPM_chipPump = 0
+    in_sensor = False
+    # Numero dei carrelli
+    numCarr = 10
+    # Contatore carrelli
+    carrCounter = []
 
     # Inzializzazione
     def __init__(self, Name):
         self.setName(Name)
+        # Inizializzo i contatori dei carrelli a 0
+        #for x in range(0, self.numCarr - 1, 1):
+        #    self.carrCounter[x] = 0;
 
     # Metodo per impostare il nome
     def setName(self, NAME):
@@ -48,19 +56,63 @@ class saldatrice:
     # Metodo per leggere il numero della saldatrice
     def getNumber(self):
         return self.number
+    
+    # Metodo per impostare la temperatura della resistenza 1
+    def setTempPreH1(self, temp):
+        self.temp_preHeating1 = temp
+
+    # Metodo per leggere la temperatura della resistenza 1
+    def getTempPreH1(self):
+        return self.temp_preHeating1
+
+    # Metodo per impostare la temperatura della resistenza 2
+    def setTempPreH2(self, temp):
+        self.temp_preHeating2 = temp
+
+    # Metodo per leggere la temperatura della resistenza 2
+    def getTempPreH2(self):
+        return self.temp_preHeating2
+
+    # Metodo per impostare la temperatura della resistenza 3
+    def setTempPreH3(self, temp):
+        self.temp_preHeating3 = temp
+
+    # Metodo per leggere la temperatura della resistenza 3
+    def getTempPreH3(self):
+        return self.temp_preHeating3
+
+    # Metodo per impostare la temperatura della resistenza 3
+    def setTempBath(self, temp):
+        self.temp_bath = temp
+
+    # Metodo per leggere la temperatura della resistenza 3
+    def getTempBath(self):
+        return self.temp_bath
 
     # Metodo per impostare gli RPM della pompa principale
-    def setRPMmainPump(self, RPM):
-        self.PRM_mainPump = RPM
+    def setRPMmainPump(self, value):
+        self.PRM_mainPump = value
 
     # Metodo per leggere gli RPM della pompa principale
-    def getPRMmainPump(self):
+    def getRPMmainPump(self):
         return self.PRM_mainPump
 
     # Metodo per impostare gli RPM della pompa chip
-    def setPRMchipPump(self, RPM):
-        self.RPMM_chipPump = RPM
+    def setRPMchipPump(self, value):
+        self.RPM_chipPump = value
 
     # Metodo per leggere gli RPM della pompa chip
     def getRPMchipPump(self):
         return self.RPM_chipPump
+
+    # Metodo per settare il sensore in ingresso
+    def SetInSensor(self):
+        self.in_sensor = True
+        
+    # Metodo per resettare il sensore in ingresso
+    def ClrInSensor(self):
+        self.in_sensor = False
+
+    # Metodo che restituisce lo stato del sensore in ingresso
+    def getInSensor(self):
+        return self.in_sensor

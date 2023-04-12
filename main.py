@@ -5,6 +5,7 @@ from socket import *
 import time
 import calendar
 import saldatrice
+import sys
 
 # 03-AXXXBXXXCXXXDXXXEXXXFXXX
 # A -> Preheating 1
@@ -13,7 +14,7 @@ import saldatrice
 # D -> Main Pump RPM
 # E -> Chip Pump RPM
 # F -> Conveyor Speed
-def infoData(data_in):
+def infoData(data_in, objsal: saldatrice):
     # Tolgo la parte iniziale della stringa ( il codice -> 03- )
     data_in = data_in[3:]
     # Inizializzo il puntatore della potenza degli interi
@@ -30,20 +31,95 @@ def infoData(data_in):
         except ValueError:
             # Se è una lettera questa è la lettere che mi indica che parametro è
             param = cr
+            # A -> temperatura preriscaldo 1
             if param == 'A':
-                pass
+                objsal.setTempPreH1(int_cr)
+                continue
+            # B -> temperatura preriscaldo 2
             elif param == 'B':
-                pass
+                objsal.setTempPreH2(int_cr)
+                continue
+            # C -> temperatura preriscaldo 3
             elif param == 'C':
-                pass
-            #
+                objsal.setTempPreH3(int_cr)
+                continue
+            # D -> temperatura crogiolo
             elif param == 'D':
-                pass
-            # E RPM pompa Main
+                objsal.setTempBath(int_cr)
+                continue
+            # E -> RPM pompa Main
             elif param == 'E':
+                objsal.setRPMmainPump(int_cr)
                 pass
-            # F RPM pompa Chip
+            # F -> RPM pompa Chip
             elif param == 'F':
+                objsal.setRPMchipPump(int_cr)
+                pass
+            # G -> Sensore in ingresso
+            elif param == 'G':
+                if int_cr == 1:
+                    objsal.SetInSensor()
+                else:
+                    objsal.ClrInSensor()
+            # H -> Contatore 1° slot
+            elif param == 'H':
+                pass
+            # I -> Contatore 2° slot
+            elif param == 'I':
+                pass
+            # J -> Contatore 3° slot
+            elif param == 'J':
+                pass
+            # K -> Contatore 4° slot
+            elif param == 'K':
+                pass
+            # L -> Contatore 5° slot
+            elif param == 'L':
+                pass
+            # M -> Contatore 6° slot
+            elif param == 'M':
+                pass
+            # N -> Contatore 7° slot
+            elif param == 'N':
+                pass
+            # O -> Contatore 8° slot
+            elif param == 'O':
+                pass
+            # P -> Contatore 9° slot
+            elif param == 'P':
+                pass
+            # Q -> Contatore 10° slot
+            elif param == 'Q':
+                pass
+            # R -> Profilo 1° slot
+            elif param == 'R':
+                pass
+            # S -> Profilo 2° slot
+            elif param == 'S':
+                pass
+            # T -> Profilo 3° slot
+            elif param == 'T':
+                pass
+            # U -> Profilo 4° slot
+            elif param == 'U':
+                pass
+            # V -> Profilo 5° slot
+            elif param == 'V':
+                pass
+            # W -> Profilo 6° slot
+            elif param == 'W':
+                pass
+            # X -> Profilo 7° slot
+            elif param == 'X':
+                pass
+            # Y -> Profilo 8° slot
+            elif param == 'Y':
+                pass
+            # Z -> Profilo 9° slot
+            elif param == 'Z':
+                pass
+            # a -> Profilo 10° slot
+            elif param == 'a':
                 pass
             else:
                 print("Parametro in ingresso sconosciuto")
@@ -102,11 +178,12 @@ try:
         number = number + 1
     # Chiudo il file
     file.close()
+    saldatrice.setRPMmainPump(1000);
 except:
     print("Impossibile leggere i file di configurazione")
 
 rec_data = '03-A100B200C300D400E500F600'
-infoData(rec_data)
+infoData(rec_data, sald)
 
 # Mi connetto
 adress = ( sald.getIP(), sald.getPort() )
@@ -123,8 +200,12 @@ print(timeSync)
 timeSync = bytes(timeSync ,'utf-8')
 print(timeSync)
 # Lo invio
-sock.sendto(timeSync, adress)
-rec_data, addr = sock.recvfrom(2048)
+try:
+    sock.sendto(timeSync, adress)
+    rec_data, addr = sock.recvfrom(2048)
+except TimeoutError:
+    print("Impossibile connettersi al dispositivo")
+    sys.exit(1)
 print ("Data recived", rec_data, " ", addr)
 # Controllo la corretta ricezione
 rec_data = rec_data.decode("utf-8")
@@ -150,7 +231,7 @@ while True:
         if sub_rec_data == '02':
             sendProfile()
         # Codice 03, invio dati parametrici forno (non di stato)
-        # 03-P1TTTP2TTTP3TTTBTTTCVVVMRRRCRRR
+        # 03-AXXXBXXXCXXXDXXXEXXXFXXX
         elif sub_rec_data == '03':
             infoData()
     else:
