@@ -36,8 +36,10 @@ def infoData(data_in):
                 pass
             elif param == 'C':
                 pass
+            #
             elif param == 'D':
                 pass
+            # E RPM pompa Main
             elif param == 'E':
                 pass
             # F RPM pompa Chip
