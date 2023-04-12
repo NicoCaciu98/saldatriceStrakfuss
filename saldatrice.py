@@ -16,14 +16,14 @@ class saldatrice:
     # Numero dei carrelli
     numCarr = 10
     # Contatore carrelli
-    carrCounter = []
+    carrCounter = [0,0,0,0,0,0,0,0,0,0]
 
     # Inzializzazione
     def __init__(self, Name):
         self.setName(Name)
         # Inizializzo i contatori dei carrelli a 0
-        #for x in range(0, self.numCarr - 1, 1):
-        #    self.carrCounter[x] = 0;
+        for x in range(0, self.numCarr - 1, 1):
+            self.carrCounter[x] = 0
 
     # Metodo per impostare il nome
     def setName(self, NAME):

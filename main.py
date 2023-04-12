@@ -15,6 +15,10 @@ import sys
 # E -> Chip Pump RPM
 # F -> Conveyor Speed
 def infoData(data_in, objsal: saldatrice):
+    # Scerivo il log
+    string_to_log = "["
+    string_to_log += time.strftime("%Y-%m-%d %H:%M:%S")
+    string_to_log += "] New info data recived: "
     # Tolgo la parte iniziale della stringa ( il codice -> 03- )
     data_in = data_in[3:]
     # Inizializzo il puntatore della potenza degli interi
@@ -31,36 +35,58 @@ def infoData(data_in, objsal: saldatrice):
         except ValueError:
             # Se è una lettera questa è la lettere che mi indica che parametro è
             param = cr
+            ptr = 0
             # A -> temperatura preriscaldo 1
             if param == 'A':
                 objsal.setTempPreH1(int_cr)
+                string_to_log += "Temperature Preheating 1: "
+                string_to_log += str(int_cr)
+                string_to_log += "; "
                 continue
             # B -> temperatura preriscaldo 2
             elif param == 'B':
                 objsal.setTempPreH2(int_cr)
+                string_to_log += "Temperature Preheating 2: "
+                string_to_log += str(int_cr)
+                string_to_log += "; "
                 continue
             # C -> temperatura preriscaldo 3
             elif param == 'C':
                 objsal.setTempPreH3(int_cr)
+                string_to_log += "Temperature Preheating 3: "
+                string_to_log += str(int_cr)
+                string_to_log += "; "
                 continue
             # D -> temperatura crogiolo
             elif param == 'D':
                 objsal.setTempBath(int_cr)
+                string_to_log += "Temperature Bath: "
+                string_to_log += str(int_cr)
+                string_to_log += "; "
                 continue
             # E -> RPM pompa Main
             elif param == 'E':
                 objsal.setRPMmainPump(int_cr)
+                string_to_log += "RPM Main Wave Pump: "
+                string_to_log += str(int_cr)
+                string_to_log += "; "
                 pass
             # F -> RPM pompa Chip
             elif param == 'F':
                 objsal.setRPMchipPump(int_cr)
+                string_to_log += "RPM Chip Wave Pump: "
+                string_to_log += str(int_cr)
+                string_to_log += "; "
                 pass
             # G -> Sensore in ingresso
             elif param == 'G':
+                string_to_log += "Input Sensor: "
                 if int_cr == 1:
                     objsal.SetInSensor()
+                    string_to_log += " True; "
                 else:
                     objsal.ClrInSensor()
+                    string_to_log += " False; "
             # H -> Contatore 1° slot
             elif param == 'H':
                 pass
@@ -124,7 +150,14 @@ def infoData(data_in, objsal: saldatrice):
             else:
                 print("Parametro in ingresso sconosciuto")
             int_cr = 0
-            ptr = 0
+            
+    string_to_log += "\n"
+    # Apro il log
+    log = open("log/dataInfo.log", 'a')
+    # Scrivo nel log
+    log.write(string_to_log);
+    # Chiudo il file
+    log.close()
 
 ###########################################
 #   MAIN                                  #
@@ -182,9 +215,6 @@ try:
 except:
     print("Impossibile leggere i file di configurazione")
 
-rec_data = '03-A100B200C300D400E500F600'
-infoData(rec_data, sald)
-
 # Mi connetto
 adress = ( sald.getIP(), sald.getPort() )
 sock = socket(AF_INET, SOCK_DGRAM)
@@ -233,7 +263,7 @@ while True:
         # Codice 03, invio dati parametrici forno (non di stato)
         # 03-AXXXBXXXCXXXDXXXEXXXFXXX
         elif sub_rec_data == '03':
-            infoData()
+            infoData(rec_data, sald)
     else:
         continue
 
