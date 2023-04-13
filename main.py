@@ -7,6 +7,55 @@ import calendar
 import saldatrice
 import sys
 
+def sendProfile(data_in):
+    # Ricavo il numero del profilo
+    profile_num = data_in[3:6]
+    # Ricavo il codice operatore
+    operator_num = data_in[6:]
+    # Apro il file del profilo
+    file_path = "profili/" + str(profile_num) + ".ini"
+    profile = open(file_path, 'r')
+    string_to_send = "02-"
+    # Compongo la stringa
+    for x in profile:
+        # Tolgo il \n dalla stringa
+        x = x.translate(str.maketrans('','','\n'))
+        string_to_send += "P" + x
+    # Chiudo il file
+    profile.close()
+    # Scerivo il log
+    string_to_log = "["
+    string_to_log += time.strftime("%Y-%m-%d %H:%M:%S")
+    string_to_log += "] New request: profile #"
+    string_to_log += str(profile_num)
+    string_to_log += ", operator #"
+    string_to_log += str(operator_num)
+    string_to_log += " ARG: "
+    string_to_log += string_to_send
+    # Compongo il dato
+    string_to_send = bytes(string_to_send ,'utf-8')
+    # Lo invio
+    sock.sendto(string_to_send, adress)
+    data_in, addr = sock.recvfrom(2048)
+    print ("Data recived", data_in, " ", addr)
+    # Controllo la corretta ricezione
+    data_in = data_in.decode("utf-8")
+    print(data_in)
+    if data_in == '02-AckOK':
+        print("Sincronizzazione eseguita")
+    else:
+        print("Errore nella sincronizzazione")
+    # Salvo anche nel log
+    string_to_log += " Response: "
+    string_to_log += rec_data
+    string_to_log += "\n"
+    # Apro il log
+    profile_log = open("log/profilesReq.log", 'a')
+    # Scrivo nel log
+    profile_log.write(string_to_log);
+    # Chiudo il file
+    profile_log.close()
+
 # 03-AXXXBXXXCXXXDXXXEXXXFXXX
 # A -> Preheating 1
 # B -> Preheating 2
@@ -259,59 +308,10 @@ while True:
         # Codice 02, richiesta nuovo profilo
         # 02-NNNOOOO
         if sub_rec_data == '02':
-            sendProfile()
+            sendProfile(rec_data)
         # Codice 03, invio dati parametrici forno (non di stato)
         # 03-AXXXBXXXCXXXDXXXEXXXFXXX
         elif sub_rec_data == '03':
             infoData(rec_data, sald)
     else:
         continue
-
-def sendProfile(self):
-    # Ricavo il numero del profilo
-    profile_num = rec_data[3:6]
-    # Ricavo il codice operatore
-    operator_num = rec_data[6:]
-    # Apro il file del profilo
-    file_path = "profili/" + str(profile_num) + ".ini"
-    profile = open(file_path, 'r')
-    string_to_send = "02-"
-    # Compongo la stringa
-    for x in profile:
-        # Tolgo il \n dalla stringa
-        x = x.translate(str.maketrans('','','\n'))
-        string_to_send += "P" + x
-    # Chiudo il file
-    profile.close()
-    # Scerivo il log
-    string_to_log = "["
-    string_to_log += time.strftime("%Y-%m-%d %H:%M:%S")
-    string_to_log += "] New request: profile #"
-    string_to_log += str(profile_num)
-    string_to_log += ", operator #"
-    string_to_log += str(operator_num)
-    string_to_log += " ARG: "
-    string_to_log += string_to_send
-    # Compongo il dato
-    string_to_send = bytes(string_to_send ,'utf-8')
-    # Lo invio
-    sock.sendto(string_to_send, adress)
-    rec_data, addr = sock.recvfrom(2048)
-    print ("Data recived", rec_data, " ", addr)
-    # Controllo la corretta ricezione
-    rec_data = rec_data.decode("utf-8")
-    print(rec_data)
-    if rec_data == '02-AckOK':
-        print("Sincronizzazione eseguita")
-    else:
-        print("Errore nella sincronizzazione")
-    # Salvo anche nel log
-    string_to_log += " Response: "
-    string_to_log += rec_data
-    string_to_log += "\n"
-    # Apro il log
-    profile_log = open("log/profilesReq.log", 'a')
-    # Scrivo nel log
-    profile_log.write(string_to_log);
-    # Chiudo il file
-    profile_log.close()
