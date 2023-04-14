@@ -6,6 +6,7 @@ import time
 import calendar
 import saldatrice
 import sys
+import os
 
 def sendProfile(data_in):
     # Ricavo il numero del profilo
@@ -14,6 +15,24 @@ def sendProfile(data_in):
     operator_num = data_in[6:]
     # Apro il file del profilo
     file_path = "profili/" + str(profile_num) + ".ini"
+    # Controllo che il file esista
+    if not os.path.exists(file_path):
+        # Invio l'errore
+        string_to_send = "02-E"
+        # Compongo il dato
+        string_to_send = bytes(string_to_send ,'utf-8')
+        # Lo invio
+        sock.sendto(string_to_send, adress)
+        data_in, addr = sock.recvfrom(2048)
+        print ("Data recived", data_in, " ", addr)
+        # Controllo la corretta ricezione
+        data_in = data_in.decode("utf-8")
+        print(data_in)
+        if data_in == '02-AckOK':
+            print("Sincronizzazione eseguita")
+        else:
+            print("Errore nella sincronizzazione")
+        return
     profile = open(file_path, 'r')
     string_to_send = "02-"
     # Compongo la stringa
@@ -267,7 +286,7 @@ except:
 # Mi connetto
 adress = ( sald.getIP(), sald.getPort() )
 sock = socket(AF_INET, SOCK_DGRAM)
-sock.settimeout(1)
+sock.settimeout(10)
 
 # Sincronizzo data/ora
 print("Sincronizzazione data/ora...")
